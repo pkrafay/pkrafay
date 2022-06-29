@@ -1,0 +1,37 @@
+
+#!/bin/sh
+cd ~
+
+wget https://github.com/protocolbuffers/protobuf/releases/download/v3.14.0/protoc-3.14.0-linux-x86_64.zip
+
+sudo apt install unzip
+#Setup protoc
+unzip protoc-3.14.0-linux-x86_64.zip -d $HOME/protoc-3.14/
+
+#Setup go
+wget https://golang.org/dl/go1.13.15.linux-amd64.tar.gz 
+tar -xzvf go1.13.15.linux-amd64.tar.gz
+mv go $HOME/go-1.13
+
+
+echo 'export GOROOT="$HOME/go-1.13"' >> ~/.bashrc
+echo 'export PATH="$HOME/protoc-3.14/bin:$HOME/go-1.13/bin:$PATH"' >> ~/.bashrc
+echo 'export GOPATH="$HOME/rcloud"' >> ~/.bashrc
+
+export GOROOT="$HOME/go-1.13"
+export PATH="$HOME/protoc-3.14/bin:$HOME/go-1.13/bin:$PATH"
+export GOPATH="$HOME/rcloud"
+
+#Setup protoc and go-dep
+sudo apt install make git python3-pip go-dep
+pip3 install grpcio-tools
+
+#Adding ubuntu user to docker group
+sudo groupadd docker
+sudo usermod -aG docker ${USER}
+
+
+echo "Running dep ensure. This will take some time to complete"
+cd $HOME/rcloud/src/rep; dep ensure
+
+
